@@ -1,2 +1,2 @@
-package com.sovava.collection.api;
+package com.sovava.vacollection.api;
 //this is the packet for collection interface
