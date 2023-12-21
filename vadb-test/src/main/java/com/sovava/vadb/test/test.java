@@ -1,4 +1,4 @@
-package com.sovava.vadb.core;
+package com.sovava.vadb.test;
 
 import lombok.extern.slf4j.Slf4j;
 
