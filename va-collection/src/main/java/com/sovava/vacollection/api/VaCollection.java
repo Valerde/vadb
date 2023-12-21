@@ -23,7 +23,10 @@ public interface VaCollection<E> extends Iterable<E> {
     VaIterator<E> vaIterator();
 
     @Deprecated
-    Iterator<E> iterator();
+    @SuppressWarnings("all")
+    default Iterator<E> iterator() {
+        return null;
+    }
 
     Object[] toVaArray();
 
