@@ -15,6 +15,7 @@
         <module>va-collection</module>
         <module>vadb-core</module>
         <module>vadb-test</module>
+        <module>singleton-test</module>
     </modules>
 
     <properties>

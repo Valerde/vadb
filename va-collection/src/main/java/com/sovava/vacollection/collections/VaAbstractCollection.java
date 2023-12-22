@@ -71,7 +71,7 @@ public abstract class VaAbstractCollection<E> implements VaCollection<E> {
             os[len] = vit.next();
         }
 
-        return os;
+        return vit.hasNext() ? finishToArray(os, vit) : os;
     }
 
     @SuppressWarnings("unchecked")

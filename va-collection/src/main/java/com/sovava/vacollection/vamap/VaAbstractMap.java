@@ -5,8 +5,7 @@ import com.sovava.vacollection.api.VaIterator;
 import com.sovava.vacollection.api.VaMap;
 import com.sovava.vacollection.api.VaSet;
 import com.sovava.vacollection.collections.VaAbstractCollection;
-//
-//import java.util.Iterator;
+import com.sovava.vacollection.vaset.VaAbstractSet;
 
 
 /**
@@ -141,10 +140,56 @@ public abstract class VaAbstractMap<K, V> implements VaMap<K, V> {
 
     @Override
     public VaSet<K> keySet() {
-        VaSet<K> set = keySet;
+        VaSet<K> ks = keySet;
+        if (ks == null) {
+            ks = new VaAbstractSet<K>() {
+                @Override
+                public VaIterator<K> vaIterator() {
+                    return new VaIterator<K>() {
 
+                        private VaIterator<VaEntry<K, V>> i = entrySet().vaIterator();
 
-        return set;
+                        @Override
+                        public boolean hasNext() {
+                            return i.hasNext();
+                        }
+
+                        @Override
+                        public K next() {
+                            return i.next().getKey();
+                        }
+
+                        @Override
+                        public void remove() {
+                            i.remove();
+                        }
+                    };
+                }
+
+                @Override
+                public int size() {
+                    return VaAbstractMap.this.size();
+                }
+
+                @Override
+                public boolean isEmpty() {
+                    return VaAbstractMap.this.isEmpty();
+                }
+
+                @Override
+                public void clear() {
+                    VaAbstractMap.this.clear();
+                }
+
+                @Override
+                public boolean contains(Object o) {
+                    return VaAbstractMap.this.containsKey(o);
+                }
+            };
+            keySet = ks;
+        }
+
+        return ks;
     }
 
     @Override

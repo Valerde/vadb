@@ -7,7 +7,6 @@ import com.sovava.vacollection.api.VaListIterator;
 import com.sovava.vacollection.collections.VaAbstractCollection;
 import com.sovava.vacollection.exception.VaNoSuchElementException;
 
-import java.util.List;
 import java.util.RandomAccess;
 
 
