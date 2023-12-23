@@ -4,6 +4,7 @@ import com.sovava.vacollection.api.function.VaPredicate;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 /**
@@ -71,6 +72,9 @@ public interface VaCollection<E> extends Iterable<E> {
 
     int hashCode();
 
+    default void forEach(VaConsumer<? super E> action) {
+        Iterable.super.forEach(action);
+    }
 
     //TODO spliterator 和 stream
 
