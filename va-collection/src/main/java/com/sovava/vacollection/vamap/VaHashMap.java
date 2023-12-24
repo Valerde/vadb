@@ -132,12 +132,12 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
      * @param: key - [java.lang.Object]
      */
     VaNode<K, V> getNode(int hash, Object key) {
-        VaNode<K, V>[] tab = table;
+        VaNode<K, V>[] tab;
 
-        int n = tab.length;
-        VaNode<K, V> first = tab[(n - 1) & hash];
+        int n;
+        VaNode<K, V> first;
         K k;
-        if (tab != null && n > 0 && first != null) {
+        if ((tab = table) != null && (n = tab.length) > 0 && (first = tab[(n - 1) & hash]) != null) {
             k = first.key;
             if (first.hash == hash && (Objects.equals(key, k))) {
                 return first;
@@ -192,7 +192,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
                     e = node.next;
 
                     if (e == null) {
-                        e = newNode(hash, key, value, null);
+                        node.next = newNode(hash, key, value, null);
                         if (binCount >= DEFAULT_LIST_TO_TREE_THRESHOLD) {
                             //TODO 树化
                             int tmp;
@@ -237,7 +237,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
             if (oldCap >= MAXIMUM_CAPACITY) {
                 threshold = Integer.MAX_VALUE;
                 return oldTab;
-            } else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY && oldCap > DEFAULT_INITIAL_CAPACITY) {
+            } else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY && oldCap >= DEFAULT_INITIAL_CAPACITY) {
                 newThr = oldThr << 1;
             }
         } else if (oldThr > 0) {
@@ -248,7 +248,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
         }
 
         if (newThr == 0) {
-            float thr = newCap * loadFactor;
+            float thr = (float) newCap * loadFactor;
             newThr = (newCap < MAXIMUM_CAPACITY && thr < (float) MAXIMUM_CAPACITY) ? (int) thr : Integer.MAX_VALUE;
         }
 
@@ -272,7 +272,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
                         VaNode<K, V> next = null;
                         do {
                             next = head.next;
-                            if (((newCap - 1) & head.hash) == 0) {
+                            if ((oldCap & head.hash) == 0) {
                                 if (lTail == null) {
                                     lHead = head;
                                 } else {
@@ -319,10 +319,10 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
     }
 
     VaNode<K, V> removeNode(int hash, Object key, Object value, boolean removeIfMatch, boolean movable) {
-        VaNode<K, V>[] tab = table;
-        int n = tab.length;
+        VaNode<K, V>[] tab;
+        int n;
         VaNode<K, V> q;
-        if (tab != null && n != 0 && (q = tab[(n - 1) & hash]) != null) {
+        if ((tab = table) != null && (n = tab.length) != 0 && (q = tab[(n - 1) & hash]) != null) {
             VaNode<K, V> matchNode = null, tmpNode;
             K k = q.key;
             if (q.hash == hash && Objects.equals(k, key)) {
@@ -374,9 +374,8 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
 
     @Override
     public boolean containValue(Object value) {
-        VaNode<K, V>[] tab = table;
-        int n = tab.length;
-        if (tab != null && n != 0) {
+        VaNode<K, V>[] tab;
+        if ((tab = table) != null && size > 0) {
             for (VaNode<K, V> kvVaNode : tab) {
                 for (VaNode<K, V> node = kvVaNode; node != null; node = node.next) {
                     if (Objects.equals(node.value, value)) {
@@ -705,7 +704,8 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
                 removeNode(hash, key, null, false, true);
             }
             return newV;
-        } else if (value != null) {
+        }
+        if (value != null) {
             if (root != null) {
                 //插入树
             } else {
@@ -803,8 +803,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
 
     class VaKeySet extends VaAbstractSet<K> {
         public VaIterator<K> vaIterator() {
-            //TODO keyIterator
-            return null;
+            return new KeyIterator();
         }
 
         public int size() {
@@ -839,8 +838,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
     class VaValues extends VaAbstractCollection<V> {
 
         public VaIterator<V> vaIterator() {
-            //TODO 
-            return null;
+            return new ValueIterator();
         }
 
         public int size() {
@@ -872,7 +870,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
 
 
         public VaIterator<VaEntry<K, V>> vaIterator() {
-            return null;
+            return new EntryIterator();
         }
 
         public int size() {

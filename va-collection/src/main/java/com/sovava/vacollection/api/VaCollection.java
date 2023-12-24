@@ -26,7 +26,7 @@ public interface VaCollection<E> extends Iterable<E> {
     @Deprecated
     @SuppressWarnings("all")
     default Iterator<E> iterator() {
-        return null;
+        return vaIterator();
     }
 
     Object[] toVaArray();
