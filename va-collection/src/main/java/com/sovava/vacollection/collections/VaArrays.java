@@ -27,7 +27,7 @@ public class VaArrays {
     @SuppressWarnings("unchecked")
     public static <T, O> T[] copyOf(O[] original, int newLen, Class<? extends T[]> newType) {
         T[] copy;
-        if (newType == Object[].class) {// 如果喜欢转换的类型是Object[].class,就直接创建，不需要反射
+        if ((Object)newType == (Object)Object[].class) {// 如果喜欢转换的类型是Object[].class,就直接创建，不需要反射
             copy = (T[]) new Object[newLen]; //代码运行到这里一定是Object类型,只不过不强转类型过不去编译
         } else {
             //通过反射创建新数组
