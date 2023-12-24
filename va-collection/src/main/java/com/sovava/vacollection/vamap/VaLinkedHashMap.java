@@ -10,6 +10,8 @@ import com.sovava.vacollection.api.VaMap;
  **/
 public class VaLinkedHashMap<K, V> extends VaHashMap<K, V> implements VaMap<K, V> {
 
+    private static final long serialVersionUID = -4496193419752060291L;
+
     static class VaEntry<K, V> extends VaHashMap.VaNode<K, V> {
         VaEntry<K, V> before, after;
 
