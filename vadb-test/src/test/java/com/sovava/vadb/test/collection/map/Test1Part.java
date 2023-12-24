@@ -266,4 +266,21 @@ public class Test1Part {
         map2.forEach((key, value) -> System.out.println(key + " : " + value));
         map3.forEach((key, value) -> System.out.println(key + " : " + value));
     }
+
+    @Test
+    public void testValues() {
+        Map<String, String> map = new HashMap<>();
+        VaMap<String, String> vamap = new VaHashMap<>();
+        for (int i = 0; i < 100; i++) {
+            String key = RandomObject.getRandomString(10);
+            String value = RandomObject.getRandomString(5);
+            map.put(key, value);
+            vamap.put(key, value);
+            Assert.assertTrue(vamap.containValue(value));
+        }
+
+        for (String value : map.values()) {
+            Assert.assertTrue(vamap.containValue(value));
+        }
+    }
 }
