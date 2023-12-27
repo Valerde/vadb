@@ -2,10 +2,12 @@ package com.sovava.vacollection.api;
 
 import com.sovava.vacollection.api.function.VaUnaryOperator;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
- * description: TODO:
+ * description:
  *
  * @Author sovava
  * @Date 12/18/23 6:21 PM
@@ -27,13 +29,22 @@ public interface VaList<E> extends VaCollection<E> {
 
     default void replaceAll(VaUnaryOperator<E> operator) {
         Objects.requireNonNull(operator);
-
+        VaListIterator<E> vlit = listIterator();
+        while(vlit.hasNext()){
+            vlit.set(operator.apply(vlit.next()));
+        }
     }
 
     default void sort(VaComparator<? extends E> c) {
         Object[] os = this.toVaArray();
-//        VaArrays.sort(a,(VaComparator) c);
+//   TODO     VaArrays.sort(a,(VaComparator) c);
 
+        Arrays.sort(os, (Comparator) c);
+        VaListIterator<E> vlit = this.listIterator();
+        for (Object e : os) {
+            vlit.next();
+            vlit.set((E) e);
+        }
     }
 
 

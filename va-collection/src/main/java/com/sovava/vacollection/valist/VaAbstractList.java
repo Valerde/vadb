@@ -7,6 +7,7 @@ import com.sovava.vacollection.api.VaListIterator;
 import com.sovava.vacollection.collections.VaAbstractCollection;
 import com.sovava.vacollection.exception.VaNoSuchElementException;
 
+import java.util.NoSuchElementException;
 import java.util.RandomAccess;
 
 
@@ -125,11 +126,10 @@ public abstract class VaAbstractList<E> extends VaAbstractCollection<E> implemen
     public VaList<E> subList(int fromIndex, int toIndex) {
 
         if (this instanceof RandomAccess) {
-            //TODO VaRandomAccessSubList
+            return new VaRandomAccessSubList<>(this,fromIndex,toIndex);
         } else {
-            //TODO SubList
+            return new VaSubList<>(this,fromIndex,toIndex);
         }
-        return null;
     }
 
 
@@ -186,7 +186,7 @@ public abstract class VaAbstractList<E> extends VaAbstractCollection<E> implemen
         }
     }
 
-    protected final void rangeCheck(int idx) {
+    private void rangeCheck(int idx) {
         if (idx < 0 || idx > size()) {
             throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size());
         }
@@ -294,4 +294,173 @@ public abstract class VaAbstractList<E> extends VaAbstractCollection<E> implemen
     }
 
 
+}
+
+class VaSubList<E> extends VaAbstractList<E> {
+    private final VaAbstractList<E> l;
+    private final int offset;
+    private int size;
+
+    VaSubList(VaAbstractList<E> list, int fromIdx, int toIdx) {
+        if (fromIdx < 0) {
+            throw new IndexOutOfBoundsException("fromidx = " + fromIdx);
+        }
+        if (toIdx > list.size()) {
+            throw new IndexOutOfBoundsException("toIdx = " + toIdx);
+        }
+        if (fromIdx > toIdx) {
+            throw new IllegalArgumentException("fromIdx(" + fromIdx + ") > toIdx(" + toIdx + ")");
+        }
+        l = list;
+        offset = fromIdx;
+        size = toIdx - fromIdx;
+    }
+
+    public E set(int index, E element) {
+        rangeCheck(index);
+        return l.set(index + offset, element);
+    }
+
+    public E get(int index) {
+        rangeCheck(index);
+        return l.get(index + offset);
+    }
+
+    public void add(int index, E e) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("index: " + index + "Size: " + size);
+        }
+        l.add(index + offset, e);
+        size++;
+    }
+
+    @Override
+    public E remove(int index) {
+        rangeCheck(index);
+        E res = l.remove(index + offset);
+        size--;
+        return res;
+    }
+
+    @Override
+    protected void removeRange(int fromIndex, int toIndex) {
+        l.removeRange(fromIndex + offset, toIndex + offset);
+        size -= (toIndex - fromIndex);
+    }
+
+    public boolean addAll(VaCollection<? extends E> c) {
+        return addAll(size, c);
+    }
+
+    public boolean addAll(int index, VaCollection<? extends E> c) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("index: " + index + "Size: " + size);
+        }
+
+        int cSize = c.size();
+        if (cSize == 0) return false;
+        l.addAll(offset + index, c);
+        size += cSize;
+        return true;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public VaIterator<E> vaIterator() {
+        return listIterator(0);
+    }
+
+    @Override
+    public VaListIterator<E> listIterator(int index) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("index: " + index + "Size: " + size);
+        }
+
+        return new VaListIterator<E>() {
+
+            private final VaListIterator<E> vit = l.listIterator(index + offset);
+
+            @Override
+            public boolean hasPrevious() {
+                return previousIndex() >= 0;
+            }
+
+            @Override
+            public E previous() {
+                if (hasPrevious()) {
+                    return vit.previous();
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public int nextIndex() {
+                return vit.nextIndex() - offset;
+            }
+
+            @Override
+            public int previousIndex() {
+                return vit.previousIndex() - offset;
+            }
+
+            @Override
+            public void set(E e) {
+                vit.set(e);
+            }
+
+            @Override
+            public void add(E e) {
+                vit.add(e);
+                size++;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return nextIndex() < size;
+            }
+
+            @Override
+            public E next() {
+                if (hasNext()) {
+                    return vit.next();
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public void remove() {
+                vit.remove();
+                size--;
+            }
+        };
+    }
+
+    @Override
+    public VaList<E> subList(int fromIndex, int toIndex) {
+        return new VaSubList<E>(this, fromIndex, toIndex);
+    }
+
+    public void rangeCheck(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("index: " + index + "Size: " + size);
+        }
+    }
+
+}
+
+class VaRandomAccessSubList<E> extends VaSubList<E> implements RandomAccess {
+
+    VaRandomAccessSubList(VaAbstractList<E> list, int fromIdx, int toIdx) {
+        super(list, fromIdx, toIdx);
+    }
+
+    @Override
+    public VaList<E> subList(int fromIndex, int toIndex) {
+        return new VaRandomAccessSubList<E>(this, fromIndex, toIndex);
+    }
 }
