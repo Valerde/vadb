@@ -722,7 +722,7 @@ public class VaHashMap<K, V> extends VaAbstractMap<K, V> implements VaMap<K, V>,
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
         VaHashMap<K, V> clone;
         clone = (VaHashMap<K, V>) super.clone();
 
