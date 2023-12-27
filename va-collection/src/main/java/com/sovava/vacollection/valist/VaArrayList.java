@@ -109,6 +109,7 @@ public class VaArrayList<E> extends VaAbstractList<E> implements VaList<E>, Rand
         if (numMoved > 0) {
             System.arraycopy(elementData, idx + 1, elementData, idx, numMoved);
         }
+        elementData[size--] = null;
         return oldV;
     }
 
@@ -150,17 +151,11 @@ public class VaArrayList<E> extends VaAbstractList<E> implements VaList<E>, Rand
 
 
     public boolean addAll(VaCollection<? extends E> c) {
-        Object[] cs = c.toVaArray();
-        int csSize = c.size();
-        if (csSize == 0) return false;
-        ensureCapInternal(size + csSize);
-        System.arraycopy(cs, 0, elementData, size, csSize);
-        size += csSize;
-        return true;
+        return addAll(size, c);
     }
 
     public boolean addAll(int index, VaCollection<? extends E> c) {
-        rangeCheck(index);
+        rangeCheckForAdd(index);
         Object[] cs = c.toVaArray();
         int csSize = c.size();
         if (csSize == 0) return false;
@@ -373,6 +368,19 @@ public class VaArrayList<E> extends VaAbstractList<E> implements VaList<E>, Rand
         }
     }
 
+    private void rangeCheck(int idx) {
+        if (idx >= size()) {
+            throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size());
+        }
+    }
+
+    private void rangeCheckForAdd(int idx) {
+        if (idx < 0 || idx > this.size) {
+            throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + this.size);
+        }
+    }
+
+
     private static int calcCap(Object[] elementData, int minCap) {
         if (elementData == DEFAULT_CAPACITY_EMPTY_ELEMENT_DATA) {
             return Math.max(DEFAULT_CAPACITY, minCap);
@@ -454,7 +462,7 @@ public class VaArrayList<E> extends VaAbstractList<E> implements VaList<E>, Rand
 
         @Override
         public boolean hasPrevious() {
-            return cursor >= 0;
+            return cursor > 0;
         }
 
         @Override
@@ -656,14 +664,14 @@ public class VaArrayList<E> extends VaAbstractList<E> implements VaList<E>, Rand
             return new SubList(this, offset, fromIndex, toIndex);
         }
 
-        protected void rangeCheck(int idx) {
+        private void rangeCheck(int idx) {
             if (idx < 0 || idx > this.size) {
                 throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + this.size);
             }
         }
 
         private void rangeCheckForAdd(int idx) {
-            if (idx < 0 || idx >= this.size) {
+            if (idx < 0 || idx > this.size) {
                 throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + this.size);
             }
         }

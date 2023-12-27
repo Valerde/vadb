@@ -186,7 +186,7 @@ public abstract class VaAbstractList<E> extends VaAbstractCollection<E> implemen
         }
     }
 
-    protected void rangeCheck(int idx) {
+    private void rangeCheck(int idx) {
         if (idx < 0 || idx > size()) {
             throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size());
         }
